@@ -27,17 +27,18 @@ public class HttpApacheClientWrapper {
     private static final Logger log = Logger.getLogger(HttpApacheClientWrapper.class.getName());
     HttpClient client = HttpClientBuilder.create().build();
 
-    public HttpApacheClientWrapper() {
+    SSLContext sslContext = SSLContextBuilder
+            .create()
+            .loadTrustMaterial(new TrustSelfSignedStrategy())
+            .build();
+
+    public HttpApacheClientWrapper() throws Exception {
 
     }
 
     public HttpResponse httpPost(String endpoint, Header[] headers, String payload) throws Exception {
-        SSLContext sslContext = SSLContextBuilder
-                .create()
-                .loadTrustMaterial(new TrustSelfSignedStrategy())
-                .build();
 
-        log.info("\nCreate request \nEndpoint: " + endpoint + "\nPayload: " + payload + "\n");
+        log.info("\nPOST Request \nEndpoint: " + endpoint + "\nPayload: " + payload + "\n");
         HttpPost request = new HttpPost(endpoint);
         request.setHeaders(headers);
         request.setEntity(new StringEntity(payload));
@@ -48,12 +49,8 @@ public class HttpApacheClientWrapper {
     }
 
     public HttpResponse httpGet(String endpoint, Header[] headers) throws Exception {
-        SSLContext sslContext = SSLContextBuilder
-                .create()
-                .loadTrustMaterial(new TrustSelfSignedStrategy())
-                .build();
 
-        log.info("\nCreate request " + "\nEndpoint: " + endpoint);
+        log.info("\nGET Request " + "\nEndpoint: " + endpoint);
         HttpGet request = new HttpGet(endpoint);
         request.setHeaders(headers);
         HttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
@@ -63,12 +60,8 @@ public class HttpApacheClientWrapper {
     }
 
     public HttpResponse httpPut(String endpoint, Header[] headers, String PAYLOAD) throws Exception {
-        SSLContext sslContext = SSLContextBuilder
-                .create()
-                .loadTrustMaterial(new TrustSelfSignedStrategy())
-                .build();
 
-        log.info("\nCreate request " + "\nEndpoint: " + endpoint + "\nPayload: " + PAYLOAD + "\n");
+        log.info("\nPUT Request " + "\nEndpoint: " + endpoint + "\nPayload: " + PAYLOAD + "\n");
         HttpPut request = new HttpPut(endpoint);
         request.setHeaders(headers);
         request.setEntity(new StringEntity(PAYLOAD));
@@ -79,7 +72,7 @@ public class HttpApacheClientWrapper {
     }
 
     public HttpResponse httpDelete(String endpoint, Header[] headers) throws IOException {
-        log.info("\nCreate request " + "\nEndpoint: " + endpoint + "\n");
+        log.info("\nDELETE Request " + "\nEndpoint: " + endpoint + "\n");
         HttpDelete request = new HttpDelete(endpoint);
         request.setHeaders(headers);
         HttpResponse response = client.execute(request);

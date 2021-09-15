@@ -6,6 +6,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
@@ -14,6 +15,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
@@ -24,6 +26,8 @@ public class PeopleApiClient {
     private HttpResponse response;
     private Header contentType = new BasicHeader(HttpHeaders.CONTENT_TYPE, "application/json");
 
+    public PeopleApiClient() throws Exception {
+    }
 
 
     public HttpResponse getAllHttpPeople() throws Exception {
@@ -40,6 +44,36 @@ public class PeopleApiClient {
 
         HttpEntity entity = response.getEntity();
         String body = EntityUtils.toString(response.getEntity());
+        HttpEntity newEntity = new StringEntity(body, ContentType.get(entity));
+        response.setEntity(newEntity);
+
+        return response;
+    }
+
+    public HttpResponse PostOnePerson() throws Exception {
+        SSLContext sslContext = SSLContextBuilder
+                .create()
+                .loadTrustMaterial(new TrustSelfSignedStrategy())
+                .build();
+
+        JSONObject payload = new JSONObject();
+        payload.put("name", "Dragana");
+        payload.put("surname", "Petrovska");
+        payload.put("age", "27");
+        payload.put("isEmployed", true);
+        payload.put("location", "Ohrid");
+
+
+
+
+        HttpPost request = new HttpPost("http://localhost:3000/api/person");
+        request.setHeader(contentType);
+        request.setEntity(new StringEntity(payload.toString()));
+        HttpClient httpClient = HttpClients.custom().setSSLContext(sslContext).build();
+        HttpResponse response = httpClient.execute(request);
+
+        HttpEntity entity = response.getEntity();
+        String body = EntityUtils.toString(response.getEntity());
 
         HttpEntity newEntity = new StringEntity(body, ContentType.get(entity));
         response.setEntity(newEntity);
@@ -48,10 +82,10 @@ public class PeopleApiClient {
     }
 
 
-//    public HttpResponse getAllPeople() throws Exception {
-//        response = client.httpGet("http://localhost:3000/api/people", new Header[]{contentType});
-//        return response;
-//    }
+    public HttpResponse getAllPeople() throws Exception {
+        response = client.httpGet("http://localhost:3000/api/people", new Header[]{contentType});
+        return response;
+    }
 //
 //    public HttpResponse getSinglePerson(String personId) throws Exception {
 //        response = client.httpGet("http://localhost:3000/api/" + personId, new Header[]{contentType});

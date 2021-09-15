@@ -12,12 +12,22 @@ public class InitialTestFile {
     HttpResponse response;
     PeopleApiClient peopleApiClient = new PeopleApiClient();
 
+    public InitialTestFile() throws Exception {
+    }
+
     @Test
     public void initialTest() throws Exception {
-        response = peopleApiClient.getAllPeople();
+        response = peopleApiClient.getAllHttpPeople();
+
 
         String body = EntityUtils.toString(response.getEntity());
-        JSONObject jsonObject = new JSONObject(body);
+        JSONObject responseBodyAsObject = new JSONObject(body);
+        String responseMessage = responseBodyAsObject.get("peopleData").toString();
+
+        JSONObject peopleData = new JSONObject(responseMessage);
+        String ime = peopleData.get("name").toString();
+
+
 
     }
 }
